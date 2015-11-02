@@ -127,12 +127,21 @@ assign dwbm_adr_o = dwbm_riscv_adr;
 always @(posedge clk)
 begin
   if(rst)
-      state <= 3;
-  
+	begin
+     state <= 3;
+		 iwbm_riscv_cti <= 7;
+   	 iwbm_riscv_bte <= 2;
+   	 iwbm_riscv_sel <= 4'hF;
+   	 instruction <= 0;
+   	 iwbm_riscv_we <= 0;
+  	 iwbm_riscv_adr <= 0;
+	   kill_wishbone_ireq <= 0;
+     imem_wait <= 1;
+	end
   /* initalize */
   if(state == 3)
   begin
-         iwbm_riscv_adr <= 32'h200;
+         iwbm_riscv_adr <= 32'hf0000100;
          iwbm_riscv_cyc <= 1;
          iwbm_riscv_stb <= 1;
          state <= 2;
@@ -145,14 +154,14 @@ begin
          iwbm_riscv_stb <= 1;
          state <= 2;
          imem_wait <= 1;
-         kill_wishbone_ireq = (kill_wishbone_ireq[0])? 2 : 0; 
+         kill_wishbone_ireq <= (kill_wishbone_ireq[0])? 2 : 0; 
        end
     2: begin
         
           /* Kill wb imem request if jal(r)/branch taked. Avoid reset case */
-         if(replay_IF_out && !rst && iwbm_riscv_adr != 32'h200)
+         if(replay_IF_out && !rst && iwbm_riscv_adr != 32'hf0000100)
          begin
-           iwbm_riscv_adr = pc;
+           iwbm_riscv_adr <= pc;
            instruction <= iwbm_dat_i;
            iwbm_riscv_cyc <= 1;
            iwbm_riscv_stb <= 1;
@@ -178,8 +187,18 @@ end // always
 always @(posedge clk)
 begin
   if(rst)
+	begin
       dstate <= 1;
-  
+      dwbm_riscv_we <= 0;
+      dwbm_riscv_cyc <= 0;
+      dwbm_riscv_stb <= 0;
+      dwbm_riscv_cti <= 7;
+      dwbm_riscv_bte <= 2;
+      dwbm_riscv_sel <= 4'hF;
+      mem_read_value <= 0;
+      dwbm_riscv_adr <= 0;
+      dmem_wait <= 0;
+	end
     /* Mem Write Operation */
     if((dmem_request && dmem_we) || (dstate == 2 && dwbm_riscv_we))
     begin
