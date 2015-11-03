@@ -141,7 +141,7 @@ begin
   /* initalize */
   if(state == 3)
   begin
-         iwbm_riscv_adr <= 32'hf0000100;
+         iwbm_riscv_adr <= 32'hf0000000;
          iwbm_riscv_cyc <= 1;
          iwbm_riscv_stb <= 1;
          state <= 2;
@@ -159,7 +159,7 @@ begin
     2: begin
         
           /* Kill wb imem request if jal(r)/branch taked. Avoid reset case */
-         if(replay_IF_out && !rst && iwbm_riscv_adr != 32'hf0000100)
+         if(replay_IF_out && !rst && iwbm_riscv_adr != 32'hf0000000)
          begin
            iwbm_riscv_adr <= pc;
            instruction <= iwbm_dat_i;
