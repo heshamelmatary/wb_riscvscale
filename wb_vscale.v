@@ -95,6 +95,8 @@ reg dwbm_riscv_stb = 0;
 reg[2:0] dwbm_riscv_cti = 7;
 reg[1:0] dwbm_riscv_bte = 2;
 reg[3:0] dwbm_riscv_sel = 4'hF;
+reg[31:0] dwbm_riscv_dat = 0;
+
 reg dwbm_riscv_we = 0;
 reg[31:0] mem_read_value = 0;
 reg[31:0] dwbm_riscv_adr = 0;
@@ -206,7 +208,8 @@ begin
         1: begin
           dwbm_riscv_adr <= dmem_addr;
           dwbm_riscv_we  <= dmem_we;
-          dwbm_riscv_sel  <= (dmem_size == 0)? 4'h8 : (dmem_size == 1)? 4'hC : (dmem_size == 2)? 4'hF : 4'hF;
+          //dwbm_riscv_sel  <= (dmem_size == 0)? 4'h8 : (dmem_size == 1)? 4'hC : (dmem_size == 2)? 4'hF : 4'hF;
+          dwbm_riscv_sel  <= (dmem_size == 0)? 4'h1 : (dmem_size == 1)? 4'h3 : (dmem_size == 2)? 4'hF : 4'hF;
           dwbm_riscv_cyc <= 1;
           dwbm_riscv_stb <= 1;
           dmem_wait <= 1;
@@ -226,7 +229,7 @@ begin
     end
     
     /* Mem Read Operation */
-    if((dmem_request && !dmem_we) || (dstate == 2 && !dwbm_riscv_we))
+    if((dmem_request && !dmem_we) || (dstate == 2 && !dwbm_riscv_we) || dstate == 3)
     begin
     case(dstate)
         1: begin
@@ -234,7 +237,8 @@ begin
             dwbm_riscv_stb <= 1;
             dwbm_riscv_cyc <= 1;
             dmem_wait <= 1;
-            dwbm_riscv_sel  <= (dmem_size == 0)? 4'h8 : (dmem_size == 1)? 4'hC : (dmem_size == 2)? 4'hF : 4'hF;
+            //dwbm_riscv_sel  <= (dmem_size == 0)? 4'h8 : (dmem_size == 1)? 4'hC : (dmem_size == 2)? 4'hF : 4'hF;
+            dwbm_riscv_sel  <= (dmem_size == 0)? 4'h1 : (dmem_size == 1)? 4'h3 : (dmem_size == 2)? 4'hF : 4'hF;
             dstate <= 2;
           end
         2: begin
@@ -242,11 +246,15 @@ begin
             begin
               dwbm_riscv_cyc <= 0;
               dwbm_riscv_stb <= 0;
-              dmem_wait <= 0;
-              dstate <= 1;
+              dstate <= 3;
+						  dwbm_riscv_dat <= dwbm_dat_i;
               previous_dmem_access <= 1;
            end
           end
+        3: begin
+             dmem_wait <= 0;
+             dstate <= 1;
+					 end
 
     endcase
     
@@ -270,7 +278,7 @@ vscale_pipeline vscale_core (
    .dmem_size(dmem_size), 
    .dmem_addr(dmem_addr),
    .dmem_wdata_delayed(dwbm_dat_o),
-   .dmem_rdata(dwbm_dat_i),
+   .dmem_rdata(dwbm_riscv_dat),
    .dmem_badmem_e(1'b0) /* TODO */
    );
 

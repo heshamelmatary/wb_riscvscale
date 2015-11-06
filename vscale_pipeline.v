@@ -43,7 +43,7 @@ module vscale_pipeline(
       reg [`XPR_LEN-1:0]                        b_extend;
       reg [`XPR_LEN-1:0]                        h_extend;
       begin
-         shifted_data = data >> {addr[1:0],3'b0};
+         shifted_data = (!addr[31])? (data >> {addr[1:0],3'b0}) : data;
          b_extend = {{24{shifted_data[7]}},8'b0};
          h_extend = {{16{shifted_data[15]}},16'b0};
          case (mem_type)
