@@ -209,7 +209,8 @@ begin
           dwbm_riscv_adr <= dmem_addr;
           dwbm_riscv_we  <= dmem_we;
           //dwbm_riscv_sel  <= (dmem_size == 0)? 4'h8 : (dmem_size == 1)? 4'hC : (dmem_size == 2)? 4'hF : 4'hF;
-          dwbm_riscv_sel  <= (dmem_size == 0)? 4'h1 : (dmem_size == 1)? 4'h3 : (dmem_size == 2)? 4'hF : 4'hF;
+					dwbm_riscv_sel  <= (dmem_size == 0)? (1 << dmem_addr[1:0]) : (dmem_size == 1)? 4'h3 : (dmem_size == 2)? 4'hF : 4'hF;
+          //dwbm_riscv_sel  <= (dmem_size == 0)? 4'h1 : (dmem_size == 1)? 4'h3 : (dmem_size == 2)? 4'hF : 4'hF;
           dwbm_riscv_cyc <= 1;
           dwbm_riscv_stb <= 1;
           dmem_wait <= 1;
@@ -238,7 +239,8 @@ begin
             dwbm_riscv_cyc <= 1;
             dmem_wait <= 1;
             //dwbm_riscv_sel  <= (dmem_size == 0)? 4'h8 : (dmem_size == 1)? 4'hC : (dmem_size == 2)? 4'hF : 4'hF;
-            dwbm_riscv_sel  <= (dmem_size == 0)? 4'h1 : (dmem_size == 1)? 4'h3 : (dmem_size == 2)? 4'hF : 4'hF;
+				   	dwbm_riscv_sel  <= (dmem_size == 0)? 1 : (dmem_size == 1)? 4'h3 : (dmem_size == 2)? 4'hF : 4'hF;
+            //dwbm_riscv_sel  <= (dmem_size == 0)? 4'h1 : (dmem_size == 1)? 4'h3 : (dmem_size == 2)? 4'hF : 4'hF;
             dstate <= 2;
           end
         2: begin
