@@ -151,28 +151,28 @@ begin
 
     case (state)
     1: begin
-         iwbm_riscv_adr <= pc;
+         iwbm_riscv_adr <= (kill_wishbone_ireq)? pc - 4 : pc;
          iwbm_riscv_cyc <= 1;
          iwbm_riscv_stb <= 1;
          state <= 2;
          imem_wait <= 1;
-         kill_wishbone_ireq <= (kill_wishbone_ireq[0])? 2 : 0; 
+//         kill_wishbone_ireq <= (kill_wishbone_ireq[0])? 2 : 0; 
        end
     2: begin
         
-          /* Kill wb imem request if jal(r)/branch taked. Avoid reset case */
+          /* Kill wb imem request if jal(r)/branch taken. Avoid reset case */
          if(replay_IF_out && !rst && iwbm_riscv_adr != 32'hf0000000)
          begin
            iwbm_riscv_adr <= pc;
            instruction <= iwbm_dat_i;
-           iwbm_riscv_cyc <= 1;
-           iwbm_riscv_stb <= 1;
+           iwbm_riscv_cyc <= 0;
+           iwbm_riscv_stb <= 0;
            kill_wishbone_ireq <= 1;
            state <= 1;
            imem_wait <= 1;
          end
 
-         if((iwbm_ack_i && !replay_IF_out) || kill_wishbone_ireq == 2)
+         if((iwbm_ack_i && !replay_IF_out) /*|| kill_wishbone_ireq == 2*/)
          begin
            instruction <= iwbm_dat_i;
            kill_wishbone_ireq <= 0;
