@@ -83,11 +83,7 @@ wire replay_IF_out;
 
 reg iwbm_riscv_cyc = 0;
 reg iwbm_riscv_stb = 0;
-reg[2:0] iwbm_riscv_cti = 7;
-reg[1:0] iwbm_riscv_bte = 2;
-reg[3:0] iwbm_riscv_sel = 4'hF;
 reg[31:0] instruction = 0;
-reg      iwbm_riscv_we = 0;
 reg[31:0] iwbm_riscv_adr = 0;
 
 reg dwbm_riscv_cyc = 0;
@@ -112,10 +108,10 @@ reg cpu_start = 0;
 
 assign iwbm_stb_o = iwbm_riscv_stb;
 assign iwbm_cyc_o = iwbm_riscv_cyc;
-assign iwbm_cti_o = iwbm_riscv_cti;
-assign iwbm_bte_o = iwbm_riscv_bte;
-assign iwbm_sel_o = iwbm_riscv_sel;
-assign iwbm_we_o = iwbm_riscv_we;
+assign iwbm_cti_o = 0;
+assign iwbm_bte_o = 0;
+assign iwbm_sel_o = 4'hf;
+assign iwbm_we_o = 0;
 assign iwbm_adr_o = iwbm_riscv_adr;
 
 assign dwbm_stb_o = dwbm_riscv_stb;
@@ -239,7 +235,8 @@ begin
             dwbm_riscv_cyc <= 1;
             dmem_wait <= 1;
             //dwbm_riscv_sel  <= (dmem_size == 0)? 4'h8 : (dmem_size == 1)? 4'hC : (dmem_size == 2)? 4'hF : 4'hF;
-				   	dwbm_riscv_sel  <= (dmem_size == 0)? 1 : (dmem_size == 1)? 4'h3 : (dmem_size == 2)? 4'hF : 4'hF;
+				   	dwbm_riscv_sel  <= (dmem_size == 0 || dmem_size == 4)? 1 :
+(dmem_size == 1 || dmem_size == 5)? 4'h3 : (dmem_size == 2)? 4'hF : 4'hF;
             //dwbm_riscv_sel  <= (dmem_size == 0)? 4'h1 : (dmem_size == 1)? 4'h3 : (dmem_size == 2)? 4'hF : 4'hF;
             dstate <= 2;
           end
