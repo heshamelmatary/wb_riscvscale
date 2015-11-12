@@ -127,11 +127,7 @@ begin
   if(rst)
 	begin
      state <= 3;
-		 iwbm_riscv_cti <= 7;
-   	 iwbm_riscv_bte <= 2;
-   	 iwbm_riscv_sel <= 4'hF;
    	 instruction <= 0;
-   	 iwbm_riscv_we <= 0;
   	 iwbm_riscv_adr <= 0;
 	   kill_wishbone_ireq <= 0;
      imem_wait <= 1;
@@ -168,7 +164,7 @@ begin
            imem_wait <= 1;
          end
 
-         if((iwbm_ack_i && !replay_IF_out) /*|| kill_wishbone_ireq == 2*/)
+         if((iwbm_ack_i) && !replay_IF_out) /*|| kill_wishbone_ireq == 2*/
          begin
            instruction <= iwbm_dat_i;
            kill_wishbone_ireq <= 0;
